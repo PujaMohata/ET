@@ -77,10 +77,7 @@ if (user == 1):
 		result1 = result[0] + rent + grocery + travel + internet + dailyitem + misc
 		print("Your this Week's Expenditure is %s" % result1)
 
-
-		
-		
-    #2020-08-31 
+	#2020-08-31 
 	# 31 == lastdateof 2020 08
 	if (int(datee[8:10]) == int(calendar.monthrange(int(datee[:4]),int(datee[6:7]))[1])):
 		#2020-08-01
