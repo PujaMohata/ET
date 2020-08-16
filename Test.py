@@ -1,5 +1,5 @@
 import mysql.connector
-from datetime import date
+from datetime import date, datetime
 import calendar
 
 mydb = mysql.connector.connect(
@@ -35,11 +35,13 @@ def MontoTxt(month):
 	elif(month == '12'):
 		a = 'December'
 	return a
+	
+
 
 save = 0
 print("Enter 1 to add details \n")
 user = int(input())
-print(user)
+
 if (user == 1):
 	datee = input("Add Expenses date in the format YYYY-MM-DD : ")
 	if not datee:
@@ -57,6 +59,22 @@ if (user == 1):
 	#income = int(input("Enter your monthly income: "))
 	total = rent + grocery + travel + internet + dailyitem + misc
 	print("Your Total Expense for the day is : ",total)
+	
+	#weekly expenditure
+	if (datetime.today().isoweekday() == 7):
+		today = date.today()
+		date1 = today.strftime("%Y-%m-%d")
+		a = "%v"
+		sql = "SELECT SUM(Rent)+ SUM(Grocery) + SUM(Travel)+SUM(Internet)+SUM(DailyItem)+SUM(Miscellaneous) FROM `expenses` WHERE DATE_FORMAT(`Date`, '%s') = DATE_FORMAT('%s', '%s')" % (a,date1,a)
+		mycursor.execute(sql, date1)
+		result = mycursor.fetchone()
+		result1 = result[0] + rent + grocery + travel + internet + dailyitem + misc
+		print("Your this Week Expenditure is %s" % result1)
+
+
+		
+		
+    
 	#2020-08-31 
 	if (int(datee[8:10]) == int(calendar.monthrange(int(datee[:4]),int(datee[6:7]))[1])):
 		print("WORKING")
@@ -76,10 +94,18 @@ if (user == 1):
 		#val = (datee[4:10])
 		mycursor.execute(sql, val)
 		income1 = mycursor.fetchone()
-		print(income1[0])
-		save = income1[0] - res[0]
-		print(save)
-		print("Your Monthly Savings for %s is %s" %(MontoTxt(datee[5:7]),save))
+		print(type(income1[0]))
+		if(int(income1[0]) != 0):
+			save = income1[0] - res[0]
+			print(save)
+			print("Your Monthly Savings for %s is %s" %(MontoTxt(datee[5:7]),save))
+			
+		else:
+			print("You didn't Enter your income for the month")
+			income = int(input("Enter Your Income for the month : "))
+			save = income - res[0]
+			print("Your Monthly Savings for %s is %s" %(MontoTxt(datee[5:7]),save))
+
 		
 		
 
