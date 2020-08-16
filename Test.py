@@ -36,7 +36,9 @@ def MontoTxt(month):
 		a = 'December'
 	return a
 	
-
+def runfirstday():
+	
+	
 
 save = 0
 print("Enter 1 to add details \n")
@@ -49,6 +51,7 @@ if (user == 1):
 		datee = today.strftime("%Y-%m-%d")
 	income = 0	
 	if (datee[8:10] == '01'):
+		runfirstday()
 		income = int(input("Enter your monthly income: "))
 	rent = int(input("Add your monthly rent expense : ") or 0) 
 	grocery = int(input("Add your monthly grocery expense : ") or 0)
@@ -62,6 +65,7 @@ if (user == 1):
 	
 	#weekly expenditure
 	if (datetime.today().isoweekday() == 7):
+		calcweek(date1)
 		today = date.today()
 		date1 = today.strftime("%Y-%m-%d")
 		a = "%v"
@@ -76,9 +80,8 @@ if (user == 1):
 		
     
 	#2020-08-31 
+	# 31 == lastdateof 2020 08
 	if (int(datee[8:10]) == int(calendar.monthrange(int(datee[:4]),int(datee[6:7]))[1])):
-		print("WORKING")
-		monthTotal = 0
 		#2020-08-01
 		#'%-08-%'
 		
@@ -106,16 +109,7 @@ if (user == 1):
 			save = income - res[0]
 			print("Your Monthly Savings for %s is %s" %(MontoTxt(datee[5:7]),save))
 
-		
-		
-
-		
-	
-	
-	
-	
-	
-
+	#Inserting Values 
 	sql = "INSERT INTO expenses (Date,Rent,Grocery,Travel,Internet,DailyItem,Miscellaneous,Income,Saving) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 	val = (datee, rent, grocery, travel, internet, dailyitem, misc, income,save)
 	mycursor.execute(sql, val)
