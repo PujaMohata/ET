@@ -1,6 +1,9 @@
 import mysql.connector
 from datetime import date, datetime
 import calendar
+import sys
+# import numpy as np
+import pandas as pd
 
 # MySQL connection Block 
 # THIS FILE IS ON PUBLIC REPO SO BETTER CHANGE THIS BEFORE HOSTING IT
@@ -13,45 +16,58 @@ mydb = mysql.connector.connect(
 # MySQL Block ends here 
 
 mycursor = mydb.cursor() # Defining global mycursor var here
-
+b = ''
 def MontoTxt(month): # Function to convert month from digit to word
 	if(month == '01'):
-		a = 'January'
+		b = 'January'
 	elif(month == '02'):
-		a = 'February'
+		b = 'February'
 	elif(month == '03'):
-		a = 'March'
+		b = 'March'
 	elif(month == '04'):
-		a = 'April'
+		b = 'April'
 	elif(month == '05'):
-		a = 'May'
+		b = 'May'
 	elif(month == '06'):
-		a = 'June'
+		b = 'June'
 	elif(month == '07'):
-		a = 'July'
+		b = 'July'
 	elif(month == '08'):
-		a = 'August'
+		b = 'August'
 	elif(month == '09'):
-		a = 'September'
+		b = 'September'
 	elif(month == '10'):
-		a = 'October'
+		b = 'October'
 	elif(month == '11'):
-		a = 'November'
+		b = 'November'
 	elif(month == '12'):
-		a = 'December'
-	return a
+		b = 'December'
+	return b
 	
 
 save = 0 # Savings var
+datee = ""
+def getdate():
+	global datee
+	datee = input("Enter date in the format YYYY-MM-DD : ")
+	t = date.today()
+	d = t.strftime("%Y-%m-%d")
+	if not datee: # If date not given take the current date as default
+		today = date.today()
+		datee = today.strftime("%Y-%m-%d")
+	elif datee > d:
+		print("Sorry I can't travel to future")
+		sys.exit()
+	
 print("Enter 1 to add details \n")
+print("Enter 2 to view details \n")
+print("Enter 3 to edit details \n")
+
 user = int(input())
 
 #Entering details as user pressed 1 to add details option 
 if (user == 1):
-	datee = input("Add Expenses date in the format YYYY-MM-DD : ")
-	if not datee: # If date not given take the current date as default
-		today = date.today()
-		datee = today.strftime("%Y-%m-%d")
+	getdate()
 	income = 0 # define income as 0 for later use in calc last day expenditure
 	if (datee[8:10] == '01'): # Take income only if it's the first day of the month 
 		income = int(input("Enter your monthly income: "))
@@ -79,6 +95,7 @@ if (user == 1):
 
 	#2020-08-31 
 	# 31 == lastdateof 2020 08
+	
 	if (int(datee[8:10]) == int(calendar.monthrange(int(datee[:4]),int(datee[6:7]))[1])):
 		#2020-08-01
 		#'%-08-%'
@@ -114,4 +131,58 @@ if (user == 1):
 
 	print(mycursor.rowcount, "record inserted.") # print for fun 
    
- 
+if (user == 2):
+	getdate()
+	print("Enter the category of which you wanna view the data")
+	print("Eg. Rent, Grocery,Travel, Internet, DailyItem, Misc,ALL or Everything")
+	a = input()
+	a = a.capitalize()
+	if a == 'Dailyitem':
+		a = 'DailyItem'
+	 
+	elif a == 'Tt':
+	# 2019-08-19.... 2019-08-01 till today
+		val = datee[:7] + "-01"
+		sql = "SELECT * FROM `expenses` WHERE `Date` BETWEEN '%s' AND '%s'" %(val, datee)
+		mycursor.execute(sql,val)
+		res2 = mycursor.fetchall()
+		#print(res2)
+		df = pd.DataFrame(res2,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
+		print(df)
+		#sys.exit()
+		
+	
+	# start date till end date 
+	# 2020-08-03 till 2020-08-12
+	elif  a == 'Range':
+		val = "%-"+datee[5:7]+ "-%" +datee[8:10]# %-08-% 
+		h = "%-"+datee[5:7]+ "-%" +datee[8:10]
+		sql = "SELECT * FROM expenses WHERE `Date` LIKE '%s' AND '%s'" % (val,h)
+		mycursor.execute(sql,val)
+		myresult = mycursor.fetchall()
+		print(myresult)
+		df = pd.DataFrame(myresult,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
+		print(df)
+		#data = np.array([['Date','Rent','Grocery'],
+                #[myresult[0][0],myresult[0][1],myresult[0][2]],
+                #[myresult[1][0],myresult[1][1],myresult[1][2]]])
+		
+		#print(pd.DataFrame(data=data[1:,1:],
+                  #index=data[1:,0],
+                  #columns=data[0,1:]))
+			
+			
+	else:
+		val = "%-"+datee[5:7]+ "-%" # %-08-%
+		sql = "SELECT SUM(%s) FROM expenses WHERE `Date` LIKE '%s'" %(a,val)
+		#val = (datee[4:10])
+		mycursor.execute(sql, val)
+		value = mycursor.fetchone()
+		print(value[0])
+		
+if (user == 3):
+	getdate()
+	print("Wanna Edit Your Expense of any day?")
+	
+		
+	
