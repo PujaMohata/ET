@@ -47,17 +47,28 @@ def MontoTxt(month): # Function to convert month from digit to word
 
 save = 0 # Savings var
 datee = ""
-def getdate():
+def getdate(): # Function that will enter date as and when required
 	global datee
 	datee = input("Enter date in the format YYYY-MM-DD : ")
 	t = date.today()
 	d = t.strftime("%Y-%m-%d")
+	format = "%Y-%m-d"
+	datetime.strptime(datee, format)
 	if not datee: # If date not given take the current date as default
 		today = date.today()
 		datee = today.strftime("%Y-%m-%d")
 	elif datee > d:
 		print("Sorry I can't travel to future")
 		sys.exit()
+		
+def validatedate(): # Function that validates the date in our correct format
+	date_string = '2020-31-08'
+	format = "%Y-%m-d"
+	#try:
+	datetime.strptime(date_string, format)
+	print("This is the correct date string format.")
+	#except ValueError:
+	print("This is the incorrect date string format. It should be YYYY-MM-DD")
 	
 print("Enter 1 to add details \n")
 print("Enter 2 to view details \n")
@@ -132,7 +143,7 @@ if (user == 1):
 	print(mycursor.rowcount, "record inserted.") # print for fun 
    
 if (user == 2):
-	getdate()
+	#getdate()
 	print("Enter the category of which you wanna view the data")
 	print("Eg. Rent, Grocery,Travel, Internet, DailyItem, Misc,ALL or Everything")
 	a = input()
@@ -140,27 +151,31 @@ if (user == 2):
 	if a == 'Dailyitem':
 		a = 'DailyItem'
 	 
-	elif a == 'Tt':
-	# 2019-08-19.... 2019-08-01 till today
-		val = datee[:7] + "-01"
-		sql = "SELECT * FROM `expenses` WHERE `Date` BETWEEN '%s' AND '%s'" %(val, datee)
-		mycursor.execute(sql,val)
-		res2 = mycursor.fetchall()
-		#print(res2)
-		df = pd.DataFrame(res2,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
-		print(df)
-		#sys.exit()
+	# elif a == 'Tt':
+	# # 2019-08-19.... 2019-08-01 till today
+		# val = datee[:7] + "-01"
+		# sql = "SELECT * FROM `expenses` WHERE `Date` BETWEEN '%s' AND '%s'" %(val, datee)
+		# mycursor.execute(sql,val)
+		# res2 = mycursor.fetchall()
+		# #print(res2)
+		# df = pd.DataFrame(res2,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
+		# print(df)
+		# #sys.exit()
 		
 	
 	# start date till end date 
 	# 2020-08-03 till 2020-08-12
 	elif  a == 'Range':
-		val = "%-"+datee[5:7]+ "-%" +datee[8:10]# %-08-% 
-		h = "%-"+datee[5:7]+ "-%" +datee[8:10]
-		sql = "SELECT * FROM expenses WHERE `Date` LIKE '%s' AND '%s'" % (val,h)
+		print("Enter the Initial date(YYYY-MM-DD) : ")
+		val = input()
+		print("Enter the Final date(YYYY-MM-DD): ")
+		h = input()
+		#val = "-" + datee[5:7]+ "-" + datee[8:10]# %-08-% 
+		#h = "-" + datee[5:7]+ "-" + datee[8:10]
+		sql = "SELECT * FROM expenses WHERE `Date` BETWEEN '%s' AND '%s'" % (val,h)
 		mycursor.execute(sql,val)
 		myresult = mycursor.fetchall()
-		print(myresult)
+		
 		df = pd.DataFrame(myresult,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
 		print(df)
 		#data = np.array([['Date','Rent','Grocery'],
@@ -173,6 +188,7 @@ if (user == 2):
 			
 			
 	else:
+		getdate()
 		val = "%-"+datee[5:7]+ "-%" # %-08-%
 		sql = "SELECT SUM(%s) FROM expenses WHERE `Date` LIKE '%s'" %(a,val)
 		#val = (datee[4:10])
