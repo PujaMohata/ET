@@ -50,26 +50,24 @@ datee = ""
 def getdate(): # Function that will enter date as and when required
 	global datee
 	datee = input("Enter date in the format YYYY-MM-DD : ")
+	#2020-09-02
 	t = date.today()
 	d = t.strftime("%Y-%m-%d")
-	format = "%Y-%m-d"
-	datetime.strptime(datee, format)
+	format = "%Y-%m-%d"
+	try:
+	    datetime.strptime(datee, format)
+	    return 1
+	except ValueError:
+	    print("This is the incorrect date string format. It should be YYYY-MM-DD")
+	    getdate()
+	
 	if not datee: # If date not given take the current date as default
 		today = date.today()
 		datee = today.strftime("%Y-%m-%d")
 	elif datee > d:
 		print("Sorry I can't travel to future")
-		sys.exit()
-		
-def validatedate(): # Function that validates the date in our correct format
-	date_string = '2020-31-08'
-	format = "%Y-%m-d"
-	#try:
-	datetime.strptime(date_string, format)
-	print("This is the correct date string format.")
-	#except ValueError:
-	print("This is the incorrect date string format. It should be YYYY-MM-DD")
-	
+		getdate()
+
 print("Enter 1 to add details \n")
 print("Enter 2 to view details \n")
 print("Enter 3 to edit details \n")
@@ -145,13 +143,13 @@ if (user == 1):
 if (user == 2):
 	#getdate()
 	print("Enter the category of which you wanna view the data")
-	print("Eg. Rent, Grocery,Travel, Internet, DailyItem, Misc,ALL or Everything")
+	print("Eg. Rent, Grocery,Travel, Internet, DailyItem, Misc or Range")
 	a = input()
 	a = a.capitalize()
 	if a == 'Dailyitem':
 		a = 'DailyItem'
 	 
-	# elif a == 'Tt':
+	# elif a == 'Tt': # Tt = till today
 	# # 2019-08-19.... 2019-08-01 till today
 		# val = datee[:7] + "-01"
 		# sql = "SELECT * FROM `expenses` WHERE `Date` BETWEEN '%s' AND '%s'" %(val, datee)
