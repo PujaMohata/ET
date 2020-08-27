@@ -2,6 +2,7 @@ import mysql.connector
 from datetime import date, datetime
 import calendar
 import sys
+import time
 # import numpy as np
 import pandas as pd
 
@@ -142,28 +143,23 @@ if (user == 1):
    
 if (user == 2):
 	#getdate()
-	print("Enter the category of which you wanna view the data")
-	print("Eg. Rent, Grocery,Travel, Internet, DailyItem, Misc or Range")
-	a = input()
-	a = a.capitalize()
-	if a == 'Dailyitem':
-		a = 'DailyItem'
-	 
-	# elif a == 'Tt': # Tt = till today
-	# # 2019-08-19.... 2019-08-01 till today
-		# val = datee[:7] + "-01"
-		# sql = "SELECT * FROM `expenses` WHERE `Date` BETWEEN '%s' AND '%s'" %(val, datee)
-		# mycursor.execute(sql,val)
-		# res2 = mycursor.fetchall()
-		# #print(res2)
-		# df = pd.DataFrame(res2,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
-		# print(df)
-		# #sys.exit()
+	print("Enter 1 for viewing for a day")
+	print("Enter 2 for viewing for a Range of dates")
+	print("Enter 3 for viewing for a Range of months")
+	a = int(input())
+	if (a == 1):
+		getdate()
+		sql = "SELECT * FROM expenses WHERE `Date` = '%s'" %(datee)
+		mycursor.execute(sql)
+		myresult = mycursor.fetchall()
+		#print (myresult)
+		
+		df = pd.DataFrame(myresult,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
+		print(df)
 		
 	
-	# start date till end date 
-	# 2020-08-03 till 2020-08-12
-	elif  a == 'Range':
+	
+	elif  a == 2:
 		print("Enter the Initial date(YYYY-MM-DD) : ")
 		val = input()
 		print("Enter the Final date(YYYY-MM-DD): ")
@@ -171,19 +167,73 @@ if (user == 2):
 		#val = "-" + datee[5:7]+ "-" + datee[8:10]# %-08-% 
 		#h = "-" + datee[5:7]+ "-" + datee[8:10]
 		sql = "SELECT * FROM expenses WHERE `Date` BETWEEN '%s' AND '%s'" % (val,h)
-		mycursor.execute(sql,val)
+		mycursor.execute(sql)
 		myresult = mycursor.fetchall()
 		
 		df = pd.DataFrame(myresult,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
 		print(df)
-		#data = np.array([['Date','Rent','Grocery'],
-                #[myresult[0][0],myresult[0][1],myresult[0][2]],
-                #[myresult[1][0],myresult[1][1],myresult[1][2]]])
 		
-		#print(pd.DataFrame(data=data[1:,1:],
-                  #index=data[1:,0],
-                  #columns=data[0,1:]))
+	
+	elif a == 3:
+		print("select a for Current month")
+		print("select b for Last month")
+		print("select c for Last 3 months")
+		v = input()
+		if (v == 'a'):
+			r = date.today()
+			t = r.strftime("%Y-%m")
+			t = t + "-%"
+			sql = "SELECT * FROM expenses WHERE `Date` LIKE '%s'" %(t)
+			#print(sql)
+			mycursor.execute(sql)
+			myresult = mycursor.fetchall()
+			#print(myresult)
+			df = pd.DataFrame(myresult,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
+			print(df)
 			
+		if (v == 'b'):
+			today = date.today()
+			if today.month == 1:
+				one_month_ago = today.replace(year=today.year - 1, month=12)
+    
+			else:
+				one_month_ago = today.replace(month=today.month - 1)
+    
+			z = one_month_ago.strftime("%Y-%m")
+			z= z + "-%" 
+			sql = "SELECT * FROM expenses WHERE `Date` LIKE '%s'" %(z)
+			mycursor.execute(sql)
+			myresult = mycursor.fetchall()
+			
+			df = pd.DataFrame(myresult,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
+			print(df)
+			
+		if (v == 'c'):
+			today = date.today()
+			#date_str = '2020-01'
+			#today = datetime.strptime(date_str, '%Y-%m').date()
+			#today = "2020-02-01"
+			#today = time.strptime(today, "%Y-%m")
+			y = today.strftime("%Y-%m")
+			y += "-31"
+			if today.month == 2:
+				two_month_ago = today.replace(year=today.year - 1, month=12)
+				
+			elif today.month == 1:
+				two_month_ago = today.replace(year=today.year - 1, month=11)
+				
+			else:
+				two_month_ago = today.replace(month=today.month - 2)
+			
+			z = two_month_ago.strftime("%Y-%m")
+			z = z+ "-01"
+			sql = "SELECT * FROM expenses WHERE `Date` BETWEEN '%s' AND '%s'" %(z,y)
+			print(sql)
+			mycursor.execute(sql)
+			myresult = mycursor.fetchall()
+			
+			df = pd.DataFrame(myresult,columns=['Date','Rent','Grocery','Travel','Internet','Daily Item','Miscellaneous','Income','Savings'])
+			print(df)
 			
 	else:
 		getdate()
@@ -195,8 +245,11 @@ if (user == 2):
 		print(value[0])
 		
 if (user == 3):
-	getdate()
 	print("Wanna Edit Your Expense of any day?")
+	getdate()
+	
+	
+	
 	
 		
 	
