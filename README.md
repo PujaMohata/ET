@@ -8,7 +8,7 @@ Date format is auto validated
 
 TO DO List
 monthly summary on 31st
-range of months
+#range of months
 
 
 Add search via 
